@@ -304,17 +304,17 @@ async function run() {
     })
 
     // all shop orders from cart for admin
-    app.get("/allShopOrders", verifyToken, verifyAdmin, async(req, res) => {
-        const result = await cartsCollection.find().toArray();
-        res.send(result);
-    })
+    // app.get("/allShopOrders", verifyToken, verifyAdmin, async(req, res) => {
+    //     const result = await cartsCollection.find().toArray();
+    //     res.send(result);
+    // })
 
-    app.delete("/allShopOrders/:id", verifyToken, verifyAdmin, async(req, res) => {
-        const id = req.params.id;
-        const query = {_id: new ObjectId(id)};
-        const result = await cartsCollection.deleteOne(query);
-        res.send(result);
-    })
+    // app.delete("/allShopOrders/:id", verifyToken, verifyAdmin, async(req, res) => {
+    //     const id = req.params.id;
+    //     const query = {_id: new ObjectId(id)};
+    //     const result = await cartsCollection.deleteOne(query);
+    //     res.send(result);
+    // })
 
     // carts collection
     app.post("/carts", async(req, res) => {
@@ -346,6 +346,16 @@ async function run() {
 
     app.get("/reviews", async(req, res) => {
         const result = await reviewsCollection.find().toArray();
+        res.send(result);
+    })
+
+    // get individual payment order
+    app.get("/shop-orders/:email", async(req, res) => {
+        const email = req.params.email;
+        const result = await paymentsCollection.find({
+            cus_email: email,
+            status: "success",
+        }).toArray();
         res.send(result);
     })
 
@@ -420,6 +430,7 @@ logistic_delivery_type: "x"
             time: customerPaymentInfo.time,
             cartIds: customerPaymentInfo.cartIds,
             cus_ordered_products: customerPaymentInfo.productItemIds,
+            cus_ordered_products_name: customerPaymentInfo.ordered_product_name,
             status: "pending"
         }
 
