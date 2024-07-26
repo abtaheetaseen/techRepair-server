@@ -44,7 +44,6 @@ async function run() {
     // jwt api
     app.post("/jwt", async(req, res) => {
         const user = req.body;
-        console.log("inside jwt", user)
         const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: "24h"});
         res.send({token})
     })
@@ -93,7 +92,6 @@ async function run() {
     // check a user is an admin or not
     app.get("/users/admin/:email", verifyToken, async(req, res) => {
         const email = req.params.email;
-        console.log("inside find admin", req.decoded.email)
         if(email !== req.decoded.email){
             return res.status(401).send({message: "Unauthorized Access"})
         }
@@ -350,10 +348,17 @@ async function run() {
     })
 
     // get individual payment order
-    app.get("/shop-orders/:email", async(req, res) => {
+    app.get("/shop-orders/:email", verifyToken, async(req, res) => {
         const email = req.params.email;
         const result = await paymentsCollection.find({
             cus_email: email,
+            status: "success",
+        }).toArray();
+        res.send(result);
+    })
+
+    app.get("/allSuccessShopOrders", verifyToken, verifyAdmin, async(req, res) => {
+        const result = await paymentsCollection.find({
             status: "success",
         }).toArray();
         res.send(result);
@@ -485,6 +490,26 @@ logistic_delivery_type: "x"
         const result = await paymentsCollection.updateOne(query, updatedDoc);
 
         res.redirect("http://localhost:5173/success");
+    })
+
+    // stats for admin and users
+    app.get("/admin-stats", async(req, res) => {
+        const users = await usersCollection.estimatedDocumentCount();
+        const services = await servicesCollection.estimatedDocumentCount();
+        const products = await productsCollection.estimatedDocumentCount();
+        const totalServicesBookings = await serviceOrdersCollection.estimatedDocumentCount();
+
+        const payments = await paymentsCollection.find({status: "success"}).toArray();
+
+        const totalRevenue = payments.reduce((total, payment) => total + payment.total_amount, 0);
+
+        res.send({
+            users,
+            services,
+            products,
+            totalServicesBookings,
+            totalRevenue,
+        })
     })
 
     // Send a ping to confirm a successful connection
