@@ -499,6 +499,7 @@ logistic_delivery_type: "x"
         const products = await productsCollection.estimatedDocumentCount();
         const totalServicesBookings = await serviceOrdersCollection.estimatedDocumentCount();
 
+        // shop order revenue
         const payments = await paymentsCollection.find({status: "success"}).toArray();
 
         const totalRevenue = payments.reduce((total, payment) => total + payment.total_amount, 0);
