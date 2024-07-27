@@ -265,8 +265,15 @@ async function run() {
     })
 
     app.get("/products", async(req, res) => {
-        const result = await productsCollection.find().toArray();
+        const page = parseInt(req.query.page);
+        const size = parseInt(req.query.size);
+        const result = await productsCollection.find().skip(page * size).limit(size).toArray();
         res.send(result);
+    })
+
+    app.get("/totalProductsCount", verifyToken, verifyAdmin, async(req, res) => {
+        const totalProductsCount = await productsCollection.estimatedDocumentCount();
+        res.send({totalProductsCount});
     })
 
     app.get("/products/:id", async(req, res) => {
