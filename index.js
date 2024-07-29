@@ -466,11 +466,11 @@ logistic_delivery_type: "x"
     })
 
     app.post("/fail", async(req, res) => {
-        res.redirect("http://localhost:5173/fail");
+        res.redirect("https://tech-repair-1939e.web.app/fail");
     })
 
     app.post("/cancel", async(req, res) => {
-        res.redirect("http://localhost:5173/cancel");
+        res.redirect("https://tech-repair-1939e.web.app/cancel");
     })
 
     app.post("/success-payment", async(req, res) => {
@@ -496,7 +496,7 @@ logistic_delivery_type: "x"
 
         const result = await paymentsCollection.updateOne(query, updatedDoc);
 
-        res.redirect("http://localhost:5173/success");
+        res.redirect("https://tech-repair-1939e.web.app/success");
     })
 
     // stats for admin and users
